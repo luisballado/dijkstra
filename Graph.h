@@ -30,9 +30,11 @@ public:
   Graph();
   ~Graph();
   void loadGraph(std::istream &input);
+  int node_Expl();
+  int num_Nodes();
   void printGraph();
-  void dijkstra();
-  void dijkstraMinHeap();
+  std::vector<int> dijkstra(int start);
+  std::vector<int> dijkstraMinHeap(int start); 
   void dijkstraFibHeap();
 };
 

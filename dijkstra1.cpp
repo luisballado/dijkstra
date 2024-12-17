@@ -1,3 +1,5 @@
+#include "Graph.h"
+#include <sstream>
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -6,9 +8,10 @@
 //implementacion normal de dijkstra con cola de prioridad
 
 // Algoritmo principal de Dijkstra
-std::vector<int> dijkstra(const std::vector<std::vector<std::pair<int,int>>>& graph, int start) {
+/*
+std::vector<int> dijkstra(Graph graph, int start) {
 
-  int n = graph.size(); //tamaño del grafo
+  int n = graph.num_Nodes(); //tamaño del grafo
   
   std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
   distances[start] = 0; // La distancia al nodo inicial es 0
@@ -36,8 +39,10 @@ std::vector<int> dijkstra(const std::vector<std::vector<std::pair<int,int>>>& gr
   
   return distances;
 }
+*/
 
 int main() {
+  /**
   // Crear un grafo dirigido con pesos
   int n, m; // n = cantidad de nodos, m = cantidad de aristas
   //cout << "Introduce el número de nodos y aristas: ";
@@ -56,9 +61,19 @@ int main() {
   int start;
   //cout << "Introduce el nodo de inicio: ";
   std::cin >> start;
+  **/
+
+  Graph graph;
+  std::stringstream inputInfo;
+  inputInfo << std::cin.rdbuf();
+  graph.loadGraph(inputInfo);
+
+  int start = graph.node_Expl();
+  int n = graph.num_Nodes();
+  
   
   // Ejecutar Dijkstra
-  std::vector<int> distances = dijkstra(graph, start);
+  std::vector<int> distances = graph.dijkstra(start);
   
   // Imprimir las distancias mínimas
   std::cout << "Distancias desde el nodo " << start << ":\n";
@@ -67,6 +82,19 @@ int main() {
       std::cout << "Nodo " << i << ": Inalcanzable\n";
     } else {
       std::cout << "Nodo " << i << ": " << distances[i] << "\n";
+    }
+  }
+
+  // Ejecutar Dijkstra
+  std::vector<int> distances2 = graph.dijkstraMinHeap(start);
+  
+  // Imprimir las distancias mínimas
+  std::cout << "Distancias desde el nodo " << start << ":\n";
+  for (int i = 0; i < n; ++i) {
+    if (distances2[i] == std::numeric_limits<int>::max()) {
+      std::cout << "Nodo " << i << ": Inalcanzable\n";
+    } else {
+      std::cout << "Nodo " << i << ": " << distances2[i] << "\n";
     }
   }
   

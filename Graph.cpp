@@ -1,4 +1,7 @@
 #include "Graph.h"
+#include <vector>
+#include <queue>
+#include <limits>
 
 // https://www.geeksforgeeks.org/how-to-find-the-maximum-element-of-a-vector-using-stl-in-c/
 // https://www.udacity.com/blog/2020/03/c-maps-explained.html
@@ -110,6 +113,14 @@ void Graph::loadGraph(std::istream &input) {
   
 }
 
+int Graph::node_Expl(){
+  return nodeExpl;
+}
+
+int Graph::num_Nodes(){
+  return numNodes;
+}
+
 void Graph::printGraph() {
   std::cout << "-------------------------" << std::endl;
   std::cout << "numNode: " << numNodes << " | "
@@ -130,10 +141,71 @@ void Graph::printGraph() {
   std::cout << "-------------------------" << std::endl;
 }
 
-void Graph::dijkstraMinHeap(){
-  std::cout << "Poner aqui implementacion DijkstraMinHeap" << std::endl;
+std::vector<int> Graph::dijkstraMinHeap(int start){
+  int n = numNodes;
+  std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
+  distances[start] = 0; // La distancia al nodo inicial es 0
+  
+  // Priority queue configurada como min heap (distancia, nodo)
+  std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> min_heap;
+  min_heap.emplace(0, start);
+  
+  while (!min_heap.empty()) {
+    auto [current_distance, current_node] = min_heap.top();
+    min_heap.pop();
+    
+    // Si la distancia actual es mayor a la almacenada, ignorar
+    if (current_distance > distances[current_node]) {
+      continue;
+    }
+    
+    // Explorar los vecinos
+    for (const auto& neighbor : adjList[current_node]) {
+      int v = neighbor.first;
+      int weight = neighbor.second;
+      
+      // Relajación de la arista
+      if (distances[current_node] + weight < distances[v]) {
+	distances[v] = distances[current_node] + weight;
+	min_heap.emplace(distances[v], v);
+      }
+    }
+  }
+  
+  return distances;
 }
 
 void Graph::dijkstraFibHeap(){
   std::cout << "Poner aqui implementacion DijkstraFibHeap" << std::endl;
+}
+
+std::vector<int> Graph::dijkstra(int start) {
+
+  int n = numNodes; //tamaño del grafo
+  
+  std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
+  distances[start] = 0; // La distancia al nodo inicial es 0
+  
+  // Cola de prioridad para procesar los nodos (distancia, nodo)
+  std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;
+  pq.emplace(0, start);
+  
+  while (!pq.empty()) {
+    auto [current_distance, current_node] = pq.top();
+    pq.pop();
+    
+    // Explorar los vecinos
+    for (const auto& neighbor : adjList[current_node]) {
+      int v = neighbor.first;
+      int weight = neighbor.second;
+      
+      // Relajación de la arista
+      if (distances[current_node] + weight < distances[v]) {
+	distances[v] = distances[current_node] + weight;
+	pq.emplace(distances[v], v);
+      }
+    }
+  }
+  
+  return distances;
 }

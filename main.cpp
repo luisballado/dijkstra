@@ -15,6 +15,7 @@ int main() {
   g.loadGraph(inputInfo); // cargar grafo
   g.printGraph();         //imprimir grafo
 
+    
   //TODO: contar tiempo1 aqui
   //g.dijkstraMinHeap();
 

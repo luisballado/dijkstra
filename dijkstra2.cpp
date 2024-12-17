@@ -6,6 +6,7 @@
 //ejemplo con min-heap
 
 // Algoritmo de Dijkstra usando priority_queue como min heap
+/*
 std::vector<int> dijkstra(std::vector<std::vector<std::pair<int,int>>>& graph, int start) {
   int n = graph.size();
   std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
@@ -39,6 +40,7 @@ std::vector<int> dijkstra(std::vector<std::vector<std::pair<int,int>>>& graph, i
   
   return distances;
 }
+*/
 
 int main() {
   // Crear un grafo dirigido con pesos
