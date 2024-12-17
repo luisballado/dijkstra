@@ -22,8 +22,8 @@ class Graph {
 private:
   int numNodes;
   int numEdges;
-
-  std::vector<std::vector<int>> adjList; //por que es un no dirigido
+  int nodeExpl;
+  std::vector<std::vector<std::pair<int,int>>> adjList;
   void split(std::string line, std::vector<int> &res);
 
 public:

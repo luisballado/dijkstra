@@ -38,6 +38,7 @@ private:
         aRight->left = b;
     }
 
+  //eliminar
     void removeNodeFromList(FibonacciNode* node) {
         if (!node) return;
         node->left->right = node->right;
@@ -45,6 +46,7 @@ private:
         node->left = node->right = node;
     }
 
+  //union de dos arboles
     void link(FibonacciNode* y, FibonacciNode* x) {
         removeNodeFromList(y);
         y->parent = x;
@@ -112,6 +114,7 @@ public:
   
   FibonacciNode* insert(int key, int distance) {
     FibonacciNode* newNode = new FibonacciNode(key, distance);
+    //revisar si hay elementos en el heap
     if (!minNode) {
       minNode = newNode;
     } else {
@@ -125,6 +128,8 @@ public:
   }
   
   FibonacciNode* extractMin() {
+    //la operacion mas importante
+    //el nodo con minimo valor es removido del heap y el arbol se reajusta
     FibonacciNode* extracted = minNode;
     if (extracted) {
       if (extracted->child) {
@@ -174,7 +179,7 @@ std::vector<int> dijkstra(const std::vector<std::vector<std::pair<int, int>>>& g
   std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
   std::vector<int> parents(n, -1);
   FibonacciHeap heap;
-  std::unordered_map<int, FibonacciNode*> nodeMap;
+  std::unordered_map<int, FibonacciNode*> nodeMap; //priority queue
   
   distances[start] = 0;
   nodeMap[start] = heap.insert(start, 0);
@@ -200,19 +205,16 @@ std::vector<int> dijkstra(const std::vector<std::vector<std::pair<int, int>>>& g
     }
   }
   
-  //cout << "Distancias desde el nodo " << start << ":\n";
-  //for (int i = 0; i < n; ++i) {
-  //    cout << "Nodo " << i << ": " << (distances[i] == INT_MAX ? -1 : distances[i]) << '\n';
-  //}
   return distances;
 }
 
 // Programa principal
 int main() {
   int n, m;
-  std::cin >> n >> m;
+  std::cin >> n >> m;//nodos - aristas
   std::vector<std::vector<std::pair<int, int>>> graph(n);
-  
+
+  //leer tod
   for (int i = 0; i < m; ++i) {
     int u, v, w;
     std::cin >> u >> v >> w;

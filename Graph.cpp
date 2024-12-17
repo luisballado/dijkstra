@@ -15,6 +15,7 @@
 Graph::Graph() {
   numNodes = 0;
   numEdges = 0;
+  nodeExpl = 0;
   adjList.clear();
   
 }
@@ -23,6 +24,7 @@ Graph::Graph() {
 Graph::~Graph() {
   numNodes = 0;
   numEdges = 0;
+  nodeExpl = 0;
   adjList.clear();
 }
 
@@ -67,12 +69,19 @@ void Graph::loadGraph(std::istream &input) {
       numEdges = result[1];
 
       //hacer resize de la lista de adj
-
+      adjList.resize(numNodes + 1);
       i++;
       continue;
-      
     }
 
+    if(i == 2){
+      std::vector<int> result;
+      split(line, result);
+      nodeExpl = result[0];
+      i++;
+      continue;
+    }
+    
     std::vector<int> result;
     
     //Validacion de entrada
@@ -81,13 +90,22 @@ void Graph::loadGraph(std::istream &input) {
       split(line, result);
     } catch (const std::invalid_argument &ia){
       std::cout << "Argumento invalido" << std::endl;
+      exit(-1);
     } catch (...){
       std::cout << "Error" << std::endl;
       exit(-1);
     }
 
     //cargar los datos del grafo
+
+    int nodo1 = result[0];
+    int nodo2 = result[1]; 
+    int peso = result[2];
+
+    adjList[nodo1].push_back({nodo2,peso});
     
+    //i++;
+    //continue;
   }
   
 }
@@ -96,10 +114,20 @@ void Graph::printGraph() {
   std::cout << "-------------------------" << std::endl;
   std::cout << "numNode: " << numNodes << " | "
             << "numEdges: " << numEdges << std::endl;
+  std::cout << "Nodo Inicio: " << nodeExpl << std::endl;
   std::cout << "-------------------------" << std::endl;
   std::cout << "LISTA ADJ" << std::endl;
   std::cout << "-------------------------" << std::endl;
-  
+  //O(n)
+  for (int nodeU = 1; nodeU <= numNodes; nodeU++) {
+    std::cout << nodeU << " --> [";
+    //O(m)
+    for (int j = 0; j < (int)adjList[nodeU].size(); j++) {
+      std::cout << "(" << adjList[nodeU][j].first << "," << adjList[nodeU][j].second << ")";
+    }
+    std::cout << "]" << std::endl;
+  }
+  std::cout << "-------------------------" << std::endl;
 }
 
 void Graph::dijkstraMinHeap(){
