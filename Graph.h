@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include "FibonacciHeap.h"
 
 //#include "EdgeInfo.h"
 
@@ -30,12 +31,12 @@ public:
   Graph();
   ~Graph();
   void loadGraph(std::istream &input);
-  int node_Expl();
-  int num_Nodes();
+  int getStartNode();
+  int getNumNodes();
   void printGraph();
   std::vector<int> dijkstra(int start);
   std::vector<int> dijkstraMinHeap(int start); 
-  void dijkstraFibHeap();
+  std::vector<int> dijkstraFibHeap(int start);
 };
 
 #endif // _GRAPH_H

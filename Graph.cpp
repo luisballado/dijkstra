@@ -3,12 +3,7 @@
 #include <queue>
 #include <limits>
 
-// https://www.geeksforgeeks.org/how-to-find-the-maximum-element-of-a-vector-using-stl-in-c/
-// https://www.udacity.com/blog/2020/03/c-maps-explained.html
-// https://stackoverflow.com/questions/1939953/how-to-find-if-a-given-key-exists-in-a-c-stdmap
-// https://www.tutorialspoint.com/how-can-i-clear-console-using-cplusplus
-
-//./main < TestCases/data.txt
+//https://www.programiz.com/dsa/fibonacci-heap
 
 ///*****************************************
 // * AQUI DEFINO LOS METODOS
@@ -55,7 +50,7 @@ void Graph::loadGraph(std::istream &input) {
 
   while(std::getline(input, line)){
 
-    std::cout << line << std::endl;
+    //std::cout << line << std::endl;
     //omitir la primera linea por ser un comentario
 
     if (i == 0){
@@ -113,11 +108,11 @@ void Graph::loadGraph(std::istream &input) {
   
 }
 
-int Graph::node_Expl(){
+int Graph::getStartNode(){
   return nodeExpl;
 }
 
-int Graph::num_Nodes(){
+int Graph::getNumNodes(){
   return numNodes;
 }
 
@@ -143,7 +138,7 @@ void Graph::printGraph() {
 
 std::vector<int> Graph::dijkstraMinHeap(int start){
   int n = numNodes;
-  std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
+  std::vector<int> distances(n+1, std::numeric_limits<int>::max()); // Vector de distancias
   distances[start] = 0; // La distancia al nodo inicial es 0
   
   // Priority queue configurada como min heap (distancia, nodo)
@@ -175,15 +170,47 @@ std::vector<int> Graph::dijkstraMinHeap(int start){
   return distances;
 }
 
-void Graph::dijkstraFibHeap(){
-  std::cout << "Poner aqui implementacion DijkstraFibHeap" << std::endl;
+std::vector<int> Graph::dijkstraFibHeap(int start){
+  
+  int n = numNodes; //tamaño del grafo
+  std::vector<int> distances(n+1, std::numeric_limits<int>::max()); // Vector de distancias
+  std::vector<int> parents(n+1, -1);
+  FibonacciHeap heap;
+  std::unordered_map<int, FibonacciNode*> nodeMap; //priority queue
+  
+  distances[start] = 0;
+  nodeMap[start] = heap.insert(start, 0);
+  
+  while (!heap.isEmpty()) {
+    FibonacciNode* minNode = heap.extractMin();
+    int u = minNode->key;
+    
+    for (const auto& neighbor : adjList[u]) {
+      int v = neighbor.first;
+      int weight = neighbor.second;
+      
+      if (distances[u] + weight < distances[v]) {
+	distances[v] = distances[u] + weight;
+	parents[v] = u;
+	
+	if (nodeMap.find(v) == nodeMap.end()) {
+	  nodeMap[v] = heap.insert(v, distances[v]);
+	} else {
+	  heap.decreaseKey(nodeMap[v], distances[v]);
+	}
+      }
+    }
+  }
+  
+  return distances;
+  
 }
 
 std::vector<int> Graph::dijkstra(int start) {
 
   int n = numNodes; //tamaño del grafo
   
-  std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
+  std::vector<int> distances(n+1, std::numeric_limits<int>::max()); // Vector de distancias
   distances[start] = 0; // La distancia al nodo inicial es 0
   
   // Cola de prioridad para procesar los nodos (distancia, nodo)
