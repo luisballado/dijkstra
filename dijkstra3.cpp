@@ -6,8 +6,6 @@
 
 //ejemplo con fibonacci heap
 
-using namespace std;
-
 // Clase para nodos en el Fibonacci Heap
 class FibonacciNode {
 public:
@@ -61,168 +59,181 @@ private:
     }
 
     void consolidate() {
-        vector<FibonacciNode*> degreeTable(ceil(log2(nodeCount)) + 1, nullptr);
-        FibonacciNode* start = minNode;
-        FibonacciNode* current = start;
+      std::vector<FibonacciNode*> degreeTable(ceil(log2(nodeCount)) + 1, nullptr);
+      FibonacciNode* start = minNode;
+      FibonacciNode* current = start;
 
-        do {
-            FibonacciNode* x = current;
-            int degree = x->degree;
-            while (degreeTable[degree]) {
-                FibonacciNode* y = degreeTable[degree];
-                if (x->distance > y->distance) swap(x, y);
-                link(y, x);
-                degreeTable[degree] = nullptr;
-                ++degree;
-            }
-            degreeTable[degree] = x;
-            current = current->right;
-        } while (current != start);
-
-        minNode = nullptr;
-        for (FibonacciNode* node : degreeTable) {
-            if (node) {
-                if (!minNode || node->distance < minNode->distance) {
-                    minNode = node;
-                }
-            }
-        }
+      do {
+	FibonacciNode* x = current;
+	int degree = x->degree;
+	while (degreeTable[degree]) {
+	  FibonacciNode* y = degreeTable[degree];
+	  if (x->distance > y->distance) std::swap(x, y);
+	  link(y, x);
+	  degreeTable[degree] = nullptr;
+	  ++degree;
+	}
+	degreeTable[degree] = x;
+	current = current->right;
+      } while (current != start);
+      
+      minNode = nullptr;
+      for (FibonacciNode* node : degreeTable) {
+	if (node) {
+	  if (!minNode || node->distance < minNode->distance) {
+	    minNode = node;
+	  }
+	}
+      }
     }
-
-    void cut(FibonacciNode* node, FibonacciNode* parent) {
-        removeNodeFromList(node);
-        parent->degree--;
-        mergeIntoRootList(minNode, node);
-        node->parent = nullptr;
-        node->marked = false;
+  
+  void cut(FibonacciNode* node, FibonacciNode* parent) {
+    removeNodeFromList(node);
+    parent->degree--;
+    mergeIntoRootList(minNode, node);
+    node->parent = nullptr;
+    node->marked = false;
+  }
+  
+  void cascadingCut(FibonacciNode* node) {
+    FibonacciNode* parent = node->parent;
+    if (parent) {
+      if (!node->marked) {
+	node->marked = true;
+      } else {
+	cut(node, parent);
+	cascadingCut(parent);
+      }
     }
-
-    void cascadingCut(FibonacciNode* node) {
-        FibonacciNode* parent = node->parent;
-        if (parent) {
-            if (!node->marked) {
-                node->marked = true;
-            } else {
-                cut(node, parent);
-                cascadingCut(parent);
-            }
-        }
-    }
-
+  }
+  
 public:
-    FibonacciHeap() : minNode(nullptr), nodeCount(0) {}
-
-    FibonacciNode* insert(int key, int distance) {
-        FibonacciNode* newNode = new FibonacciNode(key, distance);
-        if (!minNode) {
-            minNode = newNode;
-        } else {
-            mergeIntoRootList(minNode, newNode);
-            if (newNode->distance < minNode->distance) {
-                minNode = newNode;
-            }
-        }
-        ++nodeCount;
-        return newNode;
+  FibonacciHeap() : minNode(nullptr), nodeCount(0) {}
+  
+  FibonacciNode* insert(int key, int distance) {
+    FibonacciNode* newNode = new FibonacciNode(key, distance);
+    if (!minNode) {
+      minNode = newNode;
+    } else {
+      mergeIntoRootList(minNode, newNode);
+      if (newNode->distance < minNode->distance) {
+	minNode = newNode;
+      }
     }
-
-    FibonacciNode* extractMin() {
-        FibonacciNode* extracted = minNode;
-        if (extracted) {
-            if (extracted->child) {
-                FibonacciNode* child = extracted->child;
-                do {
-                    child->parent = nullptr;
-                    child = child->right;
-                } while (child != extracted->child);
-                mergeIntoRootList(minNode, extracted->child);
-            }
-
-            if (extracted->right == extracted) {
-                minNode = nullptr;
-            } else {
-                minNode = extracted->right;
-                removeNodeFromList(extracted);
-                consolidate();
-            }
-            --nodeCount;
-        }
-        return extracted;
+    ++nodeCount;
+    return newNode;
+  }
+  
+  FibonacciNode* extractMin() {
+    FibonacciNode* extracted = minNode;
+    if (extracted) {
+      if (extracted->child) {
+	FibonacciNode* child = extracted->child;
+	do {
+	  child->parent = nullptr;
+	  child = child->right;
+	} while (child != extracted->child);
+	mergeIntoRootList(minNode, extracted->child);
+      }
+      
+      if (extracted->right == extracted) {
+	minNode = nullptr;
+      } else {
+	minNode = extracted->right;
+	removeNodeFromList(extracted);
+	consolidate();
+      }
+      --nodeCount;
     }
-
-    void decreaseKey(FibonacciNode* node, int newDistance) {
-        if (newDistance >= node->distance) return;
-        node->distance = newDistance;
-        FibonacciNode* parent = node->parent;
-
-        if (parent && node->distance < parent->distance) {
-            cut(node, parent);
-            cascadingCut(parent);
-        }
-
-        if (node->distance < minNode->distance) {
-            minNode = node;
-        }
+    return extracted;
+  }
+  
+  void decreaseKey(FibonacciNode* node, int newDistance) {
+    if (newDistance >= node->distance) return;
+    node->distance = newDistance;
+    FibonacciNode* parent = node->parent;
+    
+    if (parent && node->distance < parent->distance) {
+      cut(node, parent);
+      cascadingCut(parent);
     }
-
-    bool isEmpty() const {
-        return minNode == nullptr;
+    
+    if (node->distance < minNode->distance) {
+      minNode = node;
     }
+  }
+  
+  bool isEmpty() const {
+    return minNode == nullptr;
+  }
 };
 
 // Función para Dijkstra usando Fibonacci Heap
-void dijkstra(const vector<vector<pair<int, int>>>& graph, int start) {
-    int n = graph.size();
-    vector<int> distances(n, INT_MAX);
-    vector<int> parents(n, -1);
-    FibonacciHeap heap;
-    unordered_map<int, FibonacciNode*> nodeMap;
-
-    distances[start] = 0;
-    nodeMap[start] = heap.insert(start, 0);
-
-    while (!heap.isEmpty()) {
-        FibonacciNode* minNode = heap.extractMin();
-        int u = minNode->key;
-
-        for (const auto& neighbor : graph[u]) {
-            int v = neighbor.first;
-            int weight = neighbor.second;
-
-            if (distances[u] + weight < distances[v]) {
-                distances[v] = distances[u] + weight;
-                parents[v] = u;
-
-                if (nodeMap.find(v) == nodeMap.end()) {
-                    nodeMap[v] = heap.insert(v, distances[v]);
-                } else {
-                    heap.decreaseKey(nodeMap[v], distances[v]);
-                }
-            }
-        }
+std::vector<int> dijkstra(const std::vector<std::vector<std::pair<int, int>>>& graph, int start) {
+  int n = graph.size();
+  std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
+  std::vector<int> parents(n, -1);
+  FibonacciHeap heap;
+  std::unordered_map<int, FibonacciNode*> nodeMap;
+  
+  distances[start] = 0;
+  nodeMap[start] = heap.insert(start, 0);
+  
+  while (!heap.isEmpty()) {
+    FibonacciNode* minNode = heap.extractMin();
+    int u = minNode->key;
+    
+    for (const auto& neighbor : graph[u]) {
+      int v = neighbor.first;
+      int weight = neighbor.second;
+      
+      if (distances[u] + weight < distances[v]) {
+	distances[v] = distances[u] + weight;
+	parents[v] = u;
+	
+	if (nodeMap.find(v) == nodeMap.end()) {
+	  nodeMap[v] = heap.insert(v, distances[v]);
+	} else {
+	  heap.decreaseKey(nodeMap[v], distances[v]);
+	}
+      }
     }
-
-    cout << "Distancias desde el nodo " << start << ":\n";
-    for (int i = 0; i < n; ++i) {
-        cout << "Nodo " << i << ": " << (distances[i] == INT_MAX ? -1 : distances[i]) << '\n';
-    }
+  }
+  
+  //cout << "Distancias desde el nodo " << start << ":\n";
+  //for (int i = 0; i < n; ++i) {
+  //    cout << "Nodo " << i << ": " << (distances[i] == INT_MAX ? -1 : distances[i]) << '\n';
+  //}
+  return distances;
 }
 
 // Programa principal
 int main() {
-    int n, m;
-    cin >> n >> m;
-    vector<vector<pair<int, int>>> graph(n);
-
-    for (int i = 0; i < m; ++i) {
-        int u, v, w;
-        cin >> u >> v >> w;
-        graph[u].push_back({v, w});
+  int n, m;
+  std::cin >> n >> m;
+  std::vector<std::vector<std::pair<int, int>>> graph(n);
+  
+  for (int i = 0; i < m; ++i) {
+    int u, v, w;
+    std::cin >> u >> v >> w;
+    graph[u].push_back({v, w});
+  }
+  
+  int start;
+  std::cin >> start;
+  
+  
+  std::vector<int> distances = dijkstra(graph, start);
+  
+  // Imprimir las distancias minimas
+  std::cout << "Distancias desde el nodo " << start << ":\n";
+  for (int i = 0; i < n; ++i) {
+    if (distances[i] == std::numeric_limits<int>::max()) {
+      std::cout << "Nodo " << i << ": Inalcanzable\n";
+    } else {
+      std::cout << "Nodo " << i << ": " << distances[i] << "\n";
     }
-
-    int start;
-    cin >> start;
-
-    dijkstra(graph, start);
-    return 0;
+  }
+  
+  return 0;
 }
