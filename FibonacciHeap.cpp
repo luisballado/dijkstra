@@ -12,7 +12,7 @@ void FibonacciHeap::mergeIntoRootList(FibonacciNode* a, FibonacciNode* b) {
 }
 
 void FibonacciHeap::removeNodeFromList(FibonacciNode* node) {
-    if (!node) return;
+  if (!node) return;
     node->left->right = node->right;
     node->right->left = node->left;
     node->left = node->right = node;
@@ -32,7 +32,8 @@ void FibonacciHeap::link(FibonacciNode* y, FibonacciNode* x) {
 }
 
 void FibonacciHeap::consolidate() {
-    std::vector<FibonacciNode*> degreeTable(ceil(log2(nodeCount)) + 1, nullptr);
+
+  std::vector<FibonacciNode*> degreeTable(ceil(log2(nodeCount)) + 1, nullptr);
     FibonacciNode* start = minNode;
     FibonacciNode* current = start;
 
@@ -114,6 +115,7 @@ FibonacciNode* FibonacciHeap::extractMin() {
             consolidate();
         }
         --nodeCount;
+	//delete extracted;
     }
     return extracted;
 }

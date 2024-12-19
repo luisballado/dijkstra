@@ -137,6 +137,7 @@ void Graph::printGraph() {
 }
 
 std::vector<int> Graph::dijkstraMinHeap(int start){
+  
   int n = numNodes;
   std::vector<int> distances(n+1, std::numeric_limits<int>::max()); // Vector de distancias
   distances[start] = 0; // La distancia al nodo inicial es 0
@@ -173,8 +174,8 @@ std::vector<int> Graph::dijkstraMinHeap(int start){
 std::vector<int> Graph::dijkstraFibHeap(int start){
   
   int n = numNodes; //tamaño del grafo
-  std::vector<int> distances(n+1, std::numeric_limits<int>::max()); // Vector de distancias
-  std::vector<int> parents(n+1, -1);
+  std::vector<int> distances(n, std::numeric_limits<int>::max()); // Vector de distancias
+  std::vector<int> parents(n, -1);
   FibonacciHeap heap;
   std::unordered_map<int, FibonacciNode*> nodeMap; //priority queue
   
@@ -184,12 +185,19 @@ std::vector<int> Graph::dijkstraFibHeap(int start){
   while (!heap.isEmpty()) {
     FibonacciNode* minNode = heap.extractMin();
     int u = minNode->key;
+    std::cout << "Procesando nodo: " << u << "\n";
     
+
     for (const auto& neighbor : adjList[u]) {
+      
       int v = neighbor.first;
       int weight = neighbor.second;
-      
+
+      std::cout << "Explorando vecino: " << v << " con peso: " << weight << "\n";
+      std::cout << "Distancia actual: " << distances[u] << ", Nueva distancia: " << distances[u] + weight << "\n";
+            
       if (distances[u] + weight < distances[v]) {
+	
 	distances[v] = distances[u] + weight;
 	parents[v] = u;
 	
